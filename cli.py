@@ -35,7 +35,7 @@ def get_args():
 
     parser_list = subparsers.add_parser("list", help="list polygon data")
     parser_list.add_argument(
-        "file", help="file to list", type=str, default=DEFAULT_FILE
+        "-i", "--input", help="file to list", type=str, default=DEFAULT_FILE
     )
 
     return parser.parse_args()

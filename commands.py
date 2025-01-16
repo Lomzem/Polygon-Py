@@ -64,20 +64,24 @@ def handle_get(args, polygon_key):
 
 
 def handle_list(args):
-    if os.path.splitext(args.file)[-1] != ".parquet":
-        logging.error(f'Provided input file "{args.file}" is not a parquet file')
+    if os.path.splitext(args.input)[-1] != ".parquet":
+        logging.error(f'Provided input file "{args.input}" is not a parquet file')
         return
 
-    if not os.path.exists(args.file):
-        logging.error(f'Provided input file "{args.file}" does not exist')
+    if not os.path.exists(args.input):
+        logging.error(f'Provided input file "{args.input}" does not exist')
         return
 
-    df = pd.read_parquet(args.file)
+    df = pd.read_parquet(args.input)
 
-    # print("Date range:", df['date'].min().date(), "to", df['date'].max().date())
-    # full_range = pd.date_range(start=df['date'].min(), end=df['date'].max())
-    # missing_date = full_range.difference(df['date'])
-    # print(missing_date)
-    print(df)
+    print("Date range:", df['date'].min().date(), "to", df['date'].max().date())
+    full_range = pd.date_range(start=df['date'].min(), end=df['date'].max())
+    missing_date = full_range.difference(df['date'])
+
+    for date in missing_date:
+        if date.weekday() >= 5:
+            continue
+
+        print("Missing date:", date.date())
 
     print(df.dtypes)
