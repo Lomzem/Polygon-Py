@@ -1,5 +1,5 @@
 import cli
-from commands import handle_get, handle_list
+from commands import handle_get, handle_remove, handle_list
 
 import os
 import logging
@@ -8,6 +8,8 @@ POLYGON_API_KEY = "POLYGON_IO_KEY"
 
 
 logging.basicConfig(level=logging.INFO)
+
+
 def main():
     try:
         polygon_key = os.environ[POLYGON_API_KEY]
@@ -21,7 +23,7 @@ def main():
         handle_get(args, polygon_key)
 
     elif args.command == "remove":
-        print("remove")
+        handle_remove(args)
 
     elif args.command == "list":
         handle_list(args)

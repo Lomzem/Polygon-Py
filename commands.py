@@ -63,6 +63,30 @@ def handle_get(args, polygon_key):
     merged_df.to_parquet(args.output)
 
 
+def handle_remove(args):
+    if os.path.splitext(args.input)[-1] != ".parquet":
+        logging.error(f'Provided input file "{args.input}" is not a parquet file')
+        return
+
+    df = pd.DataFrame()
+    if os.path.exists(args.input):
+        logging.info(f'Reading existing data from "{args.input}"')
+        df = pd.read_parquet(args.input)
+    else:
+        logging.info("Using default file as input")
+
+    if not os.path.exists(args.input) and args.input != DEFAULT_FILE:
+        logging.warning(f'Provided input file "{args.input}" does not exist. Skipping.')
+
+    logging.info(f"Removing {args.year}-{args.month}-{args.day}")
+    df = df[df["date"] != pd.to_datetime(args.year + "-" + args.month + "-" + args.day)]
+
+    if os.path.exists(args.output):
+        logging.info(f'Output file "{args.output}" already exists. Overwriting.')
+
+    df.to_parquet(args.output)
+
+
 def handle_list(args):
     if os.path.splitext(args.input)[-1] != ".parquet":
         logging.error(f'Provided input file "{args.input}" is not a parquet file')
@@ -74,14 +98,14 @@ def handle_list(args):
 
     df = pd.read_parquet(args.input)
 
-    print("Date range:", df['date'].min().date(), "to", df['date'].max().date())
-    full_range = pd.date_range(start=df['date'].min(), end=df['date'].max())
-    missing_date = full_range.difference(df['date'])
+    print("Your input file has the date range:")
+    print(df["date"].min().date(), "to", df["date"].max().date())
+    full_range = pd.date_range(start=df["date"].min(), end=df["date"].max())
+    missing_date = full_range.difference(df["date"])
 
+    print("\nHowever are you missing these dates:")
     for date in missing_date:
         if date.weekday() >= 5:
             continue
 
-        print("Missing date:", date.date())
-
-    print(df.dtypes)
+        print(date.date())
